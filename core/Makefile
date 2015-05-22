@@ -957,8 +957,14 @@ $(recovery_uncompressed_ramdisk): $(MINIGZIP) $(recovery_ramdisk)
 	@echo -e ${CL_CYN}"----- Making uncompressed recovery ramdisk ------"${CL_RST}
 	$(MKBOOTFS) $(TARGET_RECOVERY_ROOT_OUT) > $@
 
+$(recovery_ramdisk): $(MKBOOTFS) \
+       $(recovery_uncompressed_ramdisk)
+       @echo ----- Making recovery ramdisk ------
+       $(MINIGZIP) < $(recovery_uncompressed_ramdisk) > $@
+
 ifndef BOARD_CUSTOM_BOOTIMG_MK
-$(INSTALLED_RECOVERYIMAGE_TARGET): $(MKBOOTIMG) $(recovery_ramdisk) \
+$(INSTALLED_RECOVERYIMAGE_TARGET): $(MKBOOTIMG) \
+               $(recovery_ramdisk) \
 		$(recovery_kernel)
 	$(hide) $(MKBOOTIMG) $(INTERNAL_RECOVERYIMAGE_ARGS) $(BOARD_MKBOOTIMG_ARGS) --output $@
 ifeq (true,$(PRODUCTS.$(INTERNAL_PRODUCT).PRODUCT_SUPPORTS_VERITY))
@@ -1091,7 +1097,15 @@ SYSTEMIMAGE_SOURCE_DIR := $(TARGET_OUT)
 # image size check calculation.
 ifneq ($(INSTALLED_RECOVERYIMAGE_TARGET),)
 intermediates := $(call intermediates-dir-for,PACKAGING,recovery_patch)
+ifndef BOARD_CUSTOM_BOOTIMG_MK
+ifeq ($(CM_BUILD),)
 RECOVERY_FROM_BOOT_PATCH := $(intermediates)/recovery_from_boot.p
+else
+ RECOVERY_FROM_BOOT_PATCH :=
+endif
+else
+RECOVERY_FROM_BOOT_PATCH :=
+endif
 $(RECOVERY_FROM_BOOT_PATCH): $(INSTALLED_RECOVERYIMAGE_TARGET) \
                              $(INSTALLED_BOOTIMAGE_TARGET) \
 			     $(HOST_OUT_EXECUTABLES)/imgdiff \
@@ -1477,6 +1491,13 @@ $(BUILT_TARGET_FILES_PACKAGE): \
 ifdef INSTALLED_KERNEL_TARGET
 	$(hide) $(ACP) $(INSTALLED_KERNEL_TARGET) $(zip_root)/RECOVERY/kernel
 endif
+ifdef INSTALLED_RAMDISK_TARGET
+       $(hide) $(ACP) $(INSTALLED_RAMDISK_TARGET) $(zip_root)/BOOT/ramdisk.img
+endif
+ifdef INSTALLED_BOOTLOADER_MODULE
+       $(hide) $(ACP) \
+               $(INSTALLED_BOOTLOADER_MODULE) $(zip_root)/BOOT/bootloader
+endif
 ifdef INSTALLED_2NDBOOTLOADER_TARGET
 	$(hide) $(ACP) \
 		$(INSTALLED_2NDBOOTLOADER_TARGET) $(zip_root)/RECOVERY/second
@@ -1509,6 +1530,14 @@ endif
 ifdef INSTALLED_KERNEL_TARGET
 	$(hide) $(ACP) $(INSTALLED_KERNEL_TARGET) $(zip_root)/BOOT/kernel
 endif
+ifdef INSTALLED_RAMDISK_TARGET
+       $(hide) $(ACP) $(INSTALLED_RAMDISK_TARGET) $(zip_root)/BOOT/ramdisk.img
+endif
+ifdef INSTALLED_BOOTLOADER_MODULE
+       $(hide) $(ACP) \
+               $(INSTALLED_BOOTLOADER_MODULE) $(zip_root)/BOOT/bootloader
+endif
+
 ifdef INSTALLED_2NDBOOTLOADER_TARGET
 	$(hide) $(ACP) \
 		$(INSTALLED_2NDBOOTLOADER_TARGET) $(zip_root)/BOOT/second
@@ -1686,6 +1715,7 @@ $(INTERNAL_OTA_PACKAGE_TARGET): $(BUILT_TARGET_FILES_PACKAGE) $(DISTTOOLS)
 	$(hide) MKBOOTIMG=$(MKBOOTIMG) \
 	   $(OTA_FROM_TARGET_SCRIPT) -v \
 	   --block \
+	   --block \
 	   -p $(HOST_OUT) \
 	   -k $(KEY_CERT_PAIR) \
 	   --backup=$(backuptool) \
@@ -1728,6 +1758,9 @@ $(INTERNAL_UPDATE_PACKAGE_TARGET): $(BUILT_TARGET_FILES_PACKAGE) $(DISTTOOLS)
 	@echo -e ${CL_YLW}"Package:"${CL_RST}" $@"
 	$(hide) MKBOOTIMG=$(MKBOOTIMG) \
 	   $(IMG_FROM_TARGET_SCRIPT) -v \
+           MKBOOTIMG=$(BOARD_CUSTOM_BOOTIMG_MK) \
+           $(IMG_FROM_TARGET_SCRIPT) -v \
+           -s $(extensions) \
 	   -p $(HOST_OUT) \
 	   $(BUILT_TARGET_FILES_PACKAGE) $@
 

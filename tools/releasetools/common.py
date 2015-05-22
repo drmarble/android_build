@@ -322,6 +322,32 @@ def BuildBootableImage(sourcedir, fs_config_file, info_dict=None):
     cmd.append(img.name)
 
   else:
+    cmd = ["mkbootimg", "--kernel", os.path.join(sourcedir, "kernel")]
+
+    fn = os.path.join(sourcedir, "cmdline")
+    if os.access(fn, os.F_OK):
+      cmd.append("--cmdline")
+      cmd.append(open(fn).read().rstrip("\n"))
+
+    fn = os.path.join(sourcedir, "base")
+    if os.access(fn, os.F_OK):
+      cmd.append("--base")
+      cmd.append(open(fn).read().rstrip("\n"))
+
+    fn = os.path.join(sourcedir, "pagesize")
+    if os.access(fn, os.F_OK):
+      cmd.append("--pagesize")
+      cmd.append(open(fn).read().rstrip("\n"))
+
+    args = info_dict.get("mkbootimg_args", None)
+    if args and args.strip():
+      cmd.extend(args.split())
+
+    cmd.extend(["--ramdisk", ramdisk_img.name,
+                "--output", img.name])
+
+  else:
+
     # use MKBOOTIMG from environ, or "mkbootimg" if empty or not set
     mkbootimg = os.getenv('MKBOOTIMG') or "mkbootimg"
     cmd = [mkbootimg, "--kernel", os.path.join(sourcedir, "kernel")]
@@ -438,7 +464,14 @@ def GetBootableImage(name, prebuilt_name, unpack_dir, tree_subdir,
   otherwise construct it from the source files in
   'unpack_dir'/'tree_subdir'."""
 
-  prebuilt_path = os.path.join(unpack_dir, "BOOTABLE_IMAGES", prebuilt_name)
+  prebuilt_dir = os.path.join(unpack_dir, "BOOTABLE_IMAGES")
+  prebuilt_path = os.path.join(prebuilt_dir, prebuilt_name)
+  custom_bootimg_mk = os.getenv('MKBOOTIMG')
+  if custom_bootimg_mk:
+    bootimage_path = os.path.join(os.getenv('OUT'), "boot.img")
+    os.mkdir(prebuilt_dir)
+    shutil.copyfile(bootimage_path, prebuilt_path)
+
   if os.path.exists(prebuilt_path):
     print "using prebuilt %s from BOOTABLE_IMAGES..." % (prebuilt_name,)
     return File.FromLocalFile(name, prebuilt_path)
