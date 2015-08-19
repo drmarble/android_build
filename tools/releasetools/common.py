@@ -323,33 +323,11 @@ def BuildBootableImage(sourcedir, fs_config_file, info_dict=None):
     for argument in open(fn).read().rstrip("\n").split(" "):
       cmd.append(argument)
     cmd.append("-d")
-    cmd.append(os.path.join(sourcedir, "kernel")+":"+ramdisk_img.name)
+    cmd.append(os.path.join(sourcedir, "kernel"))
     cmd.append(img.name)
 
-  else:
-    cmd = ["mkbootimg", "--kernel", os.path.join(sourcedir, "kernel")]
-
-    fn = os.path.join(sourcedir, "cmdline")
-    if os.access(fn, os.F_OK):
-      cmd.append("--cmdline")
-      cmd.append(open(fn).read().rstrip("\n"))
-
-    fn = os.path.join(sourcedir, "base")
-    if os.access(fn, os.F_OK):
-      cmd.append("--base")
-      cmd.append(open(fn).read().rstrip("\n"))
-
-    fn = os.path.join(sourcedir, "pagesize")
-    if os.access(fn, os.F_OK):
-      cmd.append("--pagesize")
-      cmd.append(open(fn).read().rstrip("\n"))
-
-    args = info_dict.get("mkbootimg_args", None)
-    if args and args.strip():
-      cmd.extend(args.split())
-
-    cmd.extend(["--ramdisk", ramdisk_img.name,
-                "--output", img.name])
+    cmd.remove("encore")
+    cmd.remove("Ramdisk")
 
   else:
 
@@ -404,6 +382,9 @@ def BuildBootableImage(sourcedir, fs_config_file, info_dict=None):
 
     cmd.extend(["--ramdisk", ramdisk_img.name,
                 "--output", img.name])
+
+  print "cmd: ", cmd
+
   p = Run(cmd, stdout=subprocess.PIPE)
   p.communicate()
   assert p.returncode == 0, "mkbootimg of %s image failed" % (
