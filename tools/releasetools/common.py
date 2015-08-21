@@ -326,11 +326,7 @@ def BuildBootableImage(sourcedir, fs_config_file, info_dict=None):
     cmd.append(os.path.join(sourcedir, "kernel"))
     cmd.append(img.name)
 
-    cmd.remove("encore")
-    cmd.remove("Ramdisk")
-
   else:
-
     # use MKBOOTIMG from environ, or "mkbootimg" if empty or not set
     mkbootimg = os.getenv('MKBOOTIMG') or "mkbootimg"
     cmd = [mkbootimg, "--kernel", os.path.join(sourcedir, "kernel")]
