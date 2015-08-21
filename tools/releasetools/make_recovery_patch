@@ -36,9 +36,9 @@ def main(argv):
   #OPTIONS.info_dict = common.LoadInfoDict(input_dir)
 
   #recovery_img = common.GetBootableImage("recovery.img", "recovery.img",
-                                         input_dir, "RECOVERY")
+  #                                       input_dir, "RECOVERY")
   #boot_img = common.GetBootableImage("boot.img", "boot.img",
-                                     input_dir, "BOOT")
+  #                                   input_dir, "BOOT")
 
   #if not recovery_img or not boot_img:
    # sys.exit(0)
