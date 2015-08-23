@@ -969,10 +969,10 @@ $(recovery_ramdisk): $(MKBOOTFS) $(MINIGZIP) $(RECOVERYIMAGE_EXTRA_DEPS) \
 $(recovery_uncompressed_ramdisk): $(MINIGZIP) $(recovery_ramdisk)
 	@echo -e ${CL_CYN}"----- Making uncompressed recovery ramdisk ------"${CL_RST}
 	$(MKBOOTFS) $(TARGET_RECOVERY_ROOT_OUT) > $@
-$(recovery_ramdisk): $(MKBOOTFS) \
-	$(recovery_uncompressed_ramdisk)
-	@echo ----- Making recovery ramdisk ------
-	$(MINIGZIP) < $(recovery_uncompressed_ramdisk) > $@
+#$(recovery_ramdisk): $(MKBOOTFS) \
+#	$(recovery_uncompressed_ramdisk)
+#	@echo ----- Making recovery ramdisk ------
+#	$(MINIGZIP) < $(recovery_uncompressed_ramdisk) > $@
 
 ifndef BOARD_CUSTOM_BOOTIMG_MK
 $(INSTALLED_RECOVERYIMAGE_TARGET): $(MKBOOTIMG) $(recovery_ramdisk) \
