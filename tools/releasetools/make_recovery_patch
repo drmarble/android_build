@@ -26,27 +26,28 @@ import common
 OPTIONS = common.OPTIONS
 
 def main(argv):
+  test = 1
   # def option_handler(o, a):
   #   return False
 
-  args = common.ParseOptions(argv, __doc__)
-  input_dir, output_dir = args
+  #args = common.ParseOptions(argv, __doc__)
+  #input_dir, output_dir = args
 
-  OPTIONS.info_dict = common.LoadInfoDict(input_dir)
+  #OPTIONS.info_dict = common.LoadInfoDict(input_dir)
 
-  recovery_img = common.GetBootableImage("recovery.img", "recovery.img",
-                                         input_dir, "RECOVERY")
-  boot_img = common.GetBootableImage("boot.img", "boot.img",
-                                     input_dir, "BOOT")
+  #recovery_img = common.GetBootableImage("recovery.img", "recovery.img",
+  #                                       input_dir, "RECOVERY")
+  #boot_img = common.GetBootableImage("boot.img", "boot.img",
+  #                                   input_dir, "BOOT")
 
-  if not recovery_img or not boot_img:
-    sys.exit(0)
+  #if not recovery_img or not boot_img:
+   # sys.exit(0)
 
-  def output_sink(fn, data):
-    with open(os.path.join(output_dir, "SYSTEM", *fn.split("/")), "wb") as f:
-      f.write(data)
+  #def output_sink(fn, data):
+  #  with open(os.path.join(output_dir, "SYSTEM", *fn.split("/")), "wb") as f:
+  #    f.write(data)
 
-  common.MakeRecoveryPatch(input_dir, output_sink, recovery_img, boot_img)
+  #common.MakeRecoveryPatch(input_dir, output_sink, recovery_img, boot_img)
 
 
 if __name__ == '__main__':
