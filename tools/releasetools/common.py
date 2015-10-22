@@ -329,9 +329,6 @@ def BuildBootableImage(sourcedir, fs_config_file, info_dict=None):
     cmd.append("-d")
     cmd.append(os.path.join(sourcedir, "kernel"))
     cmd.append(img.name)
-    cmd.remove("encore")
-    cmd.remove("Ramdisk")
-
 
   p = Run(cmd, stdout=subprocess.PIPE)
   p.communicate()
