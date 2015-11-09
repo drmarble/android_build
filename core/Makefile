@@ -1079,10 +1079,10 @@ endif
 	$(hide) cp -r $(PRODUCT_OUT)/boot.img $(ota_temp_root)/BOOTABLE_IMAGES/
 	$(hide) cp -r $(PRODUCT_OUT)/recovery.img $(ota_temp_root)/BOOTABLE_IMAGES/
 	$(hide) ./build/tools/releasetools/make_recovery_patch $(ota_temp_root) $(ota_temp_root)
-	$(hide) rm -f $(TARGET_OUT)/bin/install-recovery.sh
-	$(hide) rm -f $(TARGET_OUT)/recovery-from-boot.p
-	$(hide) cp $(ota_temp_root)/SYSTEM/bin/install-recovery.sh $(TARGET_OUT)/bin/install-recovery.sh
-	$(hide) cp $(ota_temp_root)/SYSTEM/recovery-from-boot.p $(TARGET_OUT)/recovery-from-boot.p
+#	$(hide) rm -f $(TARGET_OUT)/bin/install-recovery.sh
+#	$(hide) rm -f $(TARGET_OUT)/recovery-from-boot.p
+#	$(hide) cp $(ota_temp_root)/SYSTEM/bin/install-recovery.sh $(TARGET_OUT)/bin/install-recovery.sh
+#	$(hide) cp $(ota_temp_root)/SYSTEM/recovery-from-boot.p $(TARGET_OUT)/recovery-from-boot.p
 
 $(RECOVERY_RESOURCE_ZIP): $(INSTALLED_RECOVERYIMAGE_TARGET)
 	$(hide) mkdir -p $(dir $@)
@@ -1693,6 +1693,14 @@ endif
 ifdef INSTALLED_KERNEL_TARGET
 	$(hide) $(ACP) $(INSTALLED_KERNEL_TARGET) $(zip_root)/BOOT/kernel
 endif
+ifdef INSTALLED_RAMDISK_TARGET
+	$(hide) $(ACP) $(INSTALLED_RAMDISK_TARGET) $(zip_root)/BOOT/ramdisk.img
+endif
+ifdef INSTALLED_BOOTLOADER_MODULE
+	$(hide) $(ACP) \
+		$(INSTALLED_BOOTLOADER_MODULE) $(zip_root)/BOOT/bootloader
+endif
+
 ifdef INSTALLED_2NDBOOTLOADER_TARGET
 	$(hide) $(ACP) \
 		$(INSTALLED_2NDBOOTLOADER_TARGET) $(zip_root)/BOOT/second
